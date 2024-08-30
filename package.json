@@ -1,7 +1,7 @@
 {
   "name": "lib-server",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Uma biblioteca simples e leve para criar servidores HTTP em Node.js",
   "main": "libserver.js",
   "scripts": {
