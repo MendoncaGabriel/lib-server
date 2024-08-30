@@ -1,5 +1,5 @@
 import http from "node:http";
-
+import jsonBodyParsin from "./middlewares/json.js"
 class Server {
   constructor() {
     this.server = http.createServer(this.handleRequest.bind(this));
@@ -14,36 +14,7 @@ class Server {
 
   // Middleware para parsear JSON
   json() {
-    return async (req, res, next) => {
-      if (req.method === "POST" || req.method === "PUT" || req.method === "PATCH") {
-        try {
-          req.body = await new Promise((resolve, reject) => {
-            let bodyString = "";
-
-            req.on("data", (chunk) => {
-              bodyString += chunk.toString();
-            });
-
-            req.on("end", () => {
-              try {
-                resolve(JSON.parse(bodyString));
-              } catch (error) {
-                reject(error);
-              }
-            });
-
-            req.on("error", (err) => {
-              reject(err);
-            });
-          });
-        } catch (error) {
-          res.statusCode = 400;
-          res.end("Erro no parse do JSON");
-          return;
-        }
-      }
-      next();  // Chama o próximo middleware ou controlador
-    };
+    return jsonBodyParsin
   }
 
   async handleRequest(req, res) {
