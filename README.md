@@ -75,7 +75,7 @@ app.get("/", (req, res) => {
 app.post("/dados", (req, res) => {
   const dados = req.body;
   console.log(dados);
-  res.end("Dados recebidos");
+  res.end("Dados recebidos"); //apenas string
 });
 
 // Inicia o servidor na porta 3000
