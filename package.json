@@ -1,0 +1,11 @@
+{
+  "name": "lib-server",
+  "version": "1.0.0",
+  "description": "Uma biblioteca simples e leve para criar servidores HTTP em Node.js",
+  "main": "libserver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
