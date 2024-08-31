@@ -1,92 +1,110 @@
 import fs from 'fs';
 import path from 'path';
-import { Transform } from 'stream';
 
-const uploadImagens = (req, res, next) => {
+// Diretório para salvar os uploads
+const uploadDir = path.join(process.cwd(), 'uploads');
+
+// Certifica-se de que o diretório de upload exista
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Função para verificar o tipo de arquivo
+const isImage = (filename) => {
+  const validExtensions = ['.png', '.jpg', '.jpeg', '.gif'];
+  const ext = path.extname(filename).toLowerCase();
+  return validExtensions.includes(ext);
+};
+
+// Middleware de upload de imagens
+const uploadMiddleware = (req, res, next) => {
   if (req.method === 'POST' && req.headers['content-type'] && req.headers['content-type'].startsWith('multipart/form-data')) {
-    const boundary = req.headers['content-type'].split('boundary=')[1];
-    if (!boundary) {
-      res.status(400).send('Erro ao identificar o boundary.');
-      return;
-    }
+    const boundary = req.headers['content-type'].split('; ')[1].replace('boundary=', '');
+    const chunks = [];
+    let fileSize = 0;
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // Limite de 5MB para o arquivo
 
-    const boundaryBuffer = Buffer.from(`--${boundary}`, 'utf-8');
-    const endBoundaryBuffer = Buffer.from(`--${boundary}--`, 'utf-8');
-    let fileData = [];
-    let fileName = null;
-    let fileStart = null;
+    req.on('data', (chunk) => {
+      fileSize += chunk.length;
+      if (fileSize > MAX_FILE_SIZE) {
+        res.statusCode = 413;
+        return res.end('Arquivo muito grande');
+      }
+      chunks.push(chunk);
+    });
 
-    const parseStream = new Transform({
-      transform(chunk, encoding, callback) {
-        const data = Buffer.from(chunk, encoding);
+    req.on('end', () => {
+      try {
+        const buffer = Buffer.concat(chunks);
+        const boundaryBytes = Buffer.from(`--${boundary}`);
+        const endBoundaryBytes = Buffer.from(`--${boundary}--`);
 
-        let startIndex = 0;
-        while ((startIndex = data.indexOf(boundaryBuffer, startIndex)) !== -1) {
-          // Find the end of the headers
-          const headersEnd = data.indexOf('\r\n\r\n', startIndex);
-          if (headersEnd !== -1) {
-            const headerLines = data.slice(startIndex + boundaryBuffer.length, headersEnd).toString();
-            const contentDisposition = headerLines.match(/Content-Disposition: form-data; name="img"; filename="([^"]+)"/);
-            if (contentDisposition) {
-              fileName = contentDisposition[1];
-              fileStart = headersEnd + 4; // Start of file content
-            }
+        // Encontra os índices dos limites
+        let startIndex = buffer.indexOf(boundaryBytes) + boundaryBytes.length;
+        let endIndex = buffer.indexOf(endBoundaryBytes);
 
-            startIndex = headersEnd + 4;
-          } else {
-            startIndex += boundaryBuffer.length;
-          }
+        if (startIndex === -1 || endIndex === -1) {
+          res.statusCode = 400;
+          return res.end('Formato de arquivo inválido');
         }
 
-        // Collect file data
-        if (fileStart !== null) {
-          const endIndex = data.indexOf(endBoundaryBuffer, fileStart);
-          if (endIndex !== -1) {
-            fileData.push(data.slice(fileStart, endIndex));
-            fileStart = null; // End of file content
-          } else if (fileStart !== null) {
-            fileData.push(data.slice(fileStart));
-          }
+        // Extrai o conteúdo entre os limites
+        const content = buffer.slice(startIndex, endIndex);
+        const headerEndIndex = content.indexOf('\r\n\r\n');
+        
+        if (headerEndIndex === -1) {
+          res.statusCode = 400;
+          return res.end('Cabeçalho do arquivo inválido');
         }
 
-        callback();
-      },
-      flush(callback) {
-        if (fileData.length > 0 && fileName) {
-          const fileBuffer = Buffer.concat(fileData);
-          const uploadDir = path.join(__dirname, 'uploads');
+        const headers = content.slice(0, headerEndIndex).toString('utf8');
+        const fileBuffer = content.slice(headerEndIndex + 4); // Os dados do arquivo começam após o cabeçalho e a quebra de linha extra
 
-          if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir);
+        // Encontra o nome do arquivo
+        const filenameMatch = headers.match(/filename="([^"]+)"/);
+        if (filenameMatch) {
+          const filename = filenameMatch[1];
+          if (!isImage(filename)) {
+            res.statusCode = 400;
+            return res.end('Apenas arquivos de imagem são permitidos');
           }
 
-          const filePath = path.join(uploadDir, fileName || 'uploaded_image.png');
+          const filePath = path.join(uploadDir, filename);
+
+          // Salva o arquivo
           fs.writeFile(filePath, fileBuffer, (err) => {
             if (err) {
               console.error('Erro ao salvar o arquivo:', err);
-              res.status(500).send('Erro ao salvar o arquivo.');
-              return;
+              res.statusCode = 500;
+              return res.end('Erro ao salvar o arquivo');
             }
 
             req.file = {
+              filename: filename,
               path: filePath,
-              name: fileName || 'uploaded_image.png',
             };
 
             next();
           });
         } else {
-          res.status(400).send('Nenhum arquivo encontrado.');
+          res.statusCode = 400;
+          res.end('Nome do arquivo não encontrado');
         }
-
-        callback();
-      },
+      } catch (error) {
+        console.error('Erro no upload:', error);
+        res.statusCode = 500;
+        res.end('Erro no upload');
+      }
     });
 
-    req.pipe(parseStream);
+    req.on('error', (err) => {
+      console.error('Erro no upload:', err);
+      res.statusCode = 500;
+      res.end('Erro no upload');
+    });
   } else {
     next();
   }
 };
 
-export default uploadImagens;
+export default uploadMiddleware;
