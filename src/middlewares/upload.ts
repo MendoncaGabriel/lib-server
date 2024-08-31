@@ -1,33 +1,16 @@
 import fs from 'fs';
 import path from 'path';
+import { UploadOptions } from "../types/UploadOptions"
 import { IRequest } from '../types/Request';
-import { IResponse } from '../types/Response';
-import { INext } from '../types/Next';
 
-interface UploadOptions {
-  path: string;
-  filename: string;
-  format: string;
-}
-
-// Função para verificar o tipo de arquivo
-const isImage = (filename: string, format: string): boolean => {
-  const validExtensions = ['.png', '.jpg', '.jpeg', '.gif'];
-  const ext = path.extname(filename).toLowerCase();
-  return validExtensions.includes(ext) && ext === `.${format}`;
-};
-
-// Middleware de upload de imagens
 const uploadMiddleware = (options: UploadOptions) => {
   const uploadDir = path.resolve(options.path);
 
-  // Certifica-se de que o diretório de upload exista
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
-  return (req: IRequest, res: IResponse, next: INext) => {
-    // Inicializa res.locals se não estiver definido
+  return (req: IRequest, res: any, next: any) => {
     if (!res.locals) {
       res.locals = {};
     }
@@ -43,7 +26,7 @@ const uploadMiddleware = (options: UploadOptions) => {
 
       const chunks: Buffer[] = [];
       let fileSize = 0;
-      const MAX_FILE_SIZE = 5 * 1024 * 1024; // Limite de 5MB para o arquivo
+      const MAX_FILE_SIZE = options.maxFileSize || 50 * 1024 * 1024; // Limite de 50MB para o arquivo
 
       req.on('data', (chunk: Buffer) => {
         fileSize += chunk.length;
@@ -60,58 +43,39 @@ const uploadMiddleware = (options: UploadOptions) => {
           const boundaryBytes = Buffer.from(`--${boundary}`);
           const endBoundaryBytes = Buffer.from(`--${boundary}--`);
 
-          // Encontra os índices dos limites
-          let startIndex = buffer.indexOf(boundaryBytes) + boundaryBytes.length;
-          let endIndex = buffer.indexOf(endBoundaryBytes);
+          let startIndex = 0;
+          let filesSaved = [];
 
-          if (startIndex === -1 || endIndex === -1) {
-            res.statusCode = 400;
-            return res.end('Formato de arquivo inválido');
-          }
+          while ((startIndex = buffer.indexOf(boundaryBytes, startIndex)) !== -1) {
+            startIndex += boundaryBytes.length;
+            const endIndex = buffer.indexOf(boundaryBytes, startIndex);
+            const part = buffer.slice(startIndex, endIndex !== -1 ? endIndex : buffer.length);
+            const headerEndIndex = part.indexOf('\r\n\r\n');
 
-          // Extrai o conteúdo entre os limites
-          const content = buffer.slice(startIndex, endIndex);
-          const headerEndIndex = content.indexOf('\r\n\r\n');
+            if (headerEndIndex === -1) break;
 
-          if (headerEndIndex === -1) {
-            res.statusCode = 400;
-            return res.end('Cabeçalho do arquivo inválido');
-          }
+            const headers = part.slice(0, headerEndIndex).toString('utf8');
+            const fileBuffer = part.slice(headerEndIndex + 4);
 
-          const headers = content.slice(0, headerEndIndex).toString('utf8');
-          const fileBuffer = content.slice(headerEndIndex + 4); // Os dados do arquivo começam após o cabeçalho e a quebra de linha extra
+            const filenameMatch = headers.match(/filename="([^"]+)"/);
+            if (filenameMatch) {
+              const originalFilename = filenameMatch[1];
+              const fileExtension = options.format || path.extname(originalFilename);
+              let filename =  originalFilename;
+              filename += fileExtension;
 
-          // Encontra o nome do arquivo
-          const filenameMatch = headers.match(/filename="([^"]+)"/);
-          if (filenameMatch) {
-            let filename = filenameMatch[1];
-            if (!isImage(filename, options.format)) {
-              res.statusCode = 400;
-              return res.end('Apenas arquivos de imagem permitidos no formato especificado');
+              const filePath = path.join(uploadDir, filename);
+
+              fs.writeFileSync(filePath, fileBuffer);
+              filesSaved.push(filePath);
             }
 
-            const filePath = path.join(uploadDir, options.filename + path.extname(filename));
-
-            // Salva o arquivo
-            fs.writeFile(filePath, fileBuffer, (err) => {
-              if (err) {
-                console.error('Erro ao salvar o arquivo:', err);
-                res.statusCode = 500;
-                return res.end('Erro ao salvar o arquivo');
-              }
-
-              req.file = {
-                filename: options.filename + path.extname(filename),
-                path: filePath,
-              };
-
-              res.locals.uploadedFilePath = filePath; // Salva o caminho no `res.locals` para acesso posterior
-              next();
-            });
-          } else {
-            res.statusCode = 400;
-            res.end('Nome do arquivo não encontrado');
+            if (endIndex === -1) break; // Final do buffer
           }
+
+          req.files = filesSaved;
+          res.locals.uploadedFilePaths = filesSaved;
+          next();
         } catch (error) {
           console.error('Erro no upload:', error);
           res.statusCode = 500;

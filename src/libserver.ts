@@ -6,13 +6,7 @@ import { IServer } from './types/Server';
 import { IRestMethods } from './types/RestMethods';
 import { IMiddleware } from './types/Middleware';
 import uploadMiddleware from './middlewares/upload';
-
-
-interface UploadOptions {
-  path: string;
-  filename: string;
-  format: string;
-}
+import {UploadOptions} from "./types/UploadOptions"
 
 class Server implements IServer, IRestMethods {
   private middlewares: IMiddleware[];
@@ -26,8 +20,8 @@ class Server implements IServer, IRestMethods {
     this.requestHandler = new RequestHandler(this.middlewares, this.router);
 
     this.server = http.createServer((req, res) => {
-      const adaptedReq = req as any; // Ajuste se necessário
-      const adaptedRes = res as any; // Ajuste se necessário
+      const adaptedReq = req as any; 
+      const adaptedRes = res as any; 
       this.requestHandler.handleRequest(adaptedReq, adaptedRes);
     });
   }

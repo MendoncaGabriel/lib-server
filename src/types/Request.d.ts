@@ -6,8 +6,5 @@ export interface IRequest extends IncomingMessage {
     params: { [key: string]: string };
     query: { [key: string]: string };
     body?: any;
-    file?: {
-        filename: string;
-        path: string;
-    };
+    files?: string[]
 }
