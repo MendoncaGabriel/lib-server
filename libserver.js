@@ -1,5 +1,6 @@
 import http from "node:http";
 import jsonBodyParsin from "./middlewares/json.js"
+
 class Server {
   constructor() {
     this.server = http.createServer(this.handleRequest.bind(this));
@@ -18,19 +19,42 @@ class Server {
   }
 
   async handleRequest(req, res) {
-    // Executa todos os middlewares em sequência antes de processar a rota
     let index = 0;
 
     const next = () => {
       if (index < this.middlewares.length) {
         const middleware = this.middlewares[index];
         index++;
-        middleware(req, res, next);  // Passa para o próximo middleware
+        middleware(req, res, next);
       } else {
-        // Quando todos os middlewares forem executados, processa a rota
-        const route = this.routes.find(
-          (r) => r.path === req.url && r.method === req.method
-        );
+        if (!req.params) {
+          req.params = {};
+        }
+
+        const route = this.routes.find((r) => {
+          // Cria uma expressão regular para capturar parâmetros dinâmicos
+          const pathRegex = new RegExp(
+            "^" +
+              r.path.replace(/\/:([^\/]+)/g, "/([^/]+)") +
+              "$"
+          );
+
+          // Verifica se a URL da requisição corresponde à expressão regular da rota
+          const match = req.url.match(pathRegex);
+          if (match) {
+            // Captura todos os parâmetros dinâmicos e armazena em req.params
+            const paramNames = r.path.match(/\/:([^\/]+)/g);
+            if (paramNames) {
+              paramNames.forEach((param, index) => {
+                const paramName = param.replace("/:","");
+                req.params[paramName] = match[index + 1]; // O primeiro item em match é a string completa
+              });
+            }
+            return true;
+          }
+          return false;
+        });
+
         if (route) {
           route.controller(req, res);
         } else {
@@ -40,8 +64,9 @@ class Server {
       }
     };
 
-    next();  // Inicia a cadeia de middlewares
+    next();
   }
+
 
   addRoute(method, path, controller) {
     this.routes.push({ method, path, controller });
