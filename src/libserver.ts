@@ -5,6 +5,14 @@ import jsonBodyParsin from './middlewares/json';
 import { IServer } from './types/Server';
 import { IRestMethods } from './types/RestMethods';
 import { IMiddleware } from './types/Middleware';
+import uploadMiddleware from './middlewares/upload';
+
+
+interface UploadOptions {
+  path: string;
+  filename: string;
+  format: string;
+}
 
 class Server implements IServer, IRestMethods {
   private middlewares: IMiddleware[];
@@ -30,6 +38,10 @@ class Server implements IServer, IRestMethods {
 
   json() {
     return jsonBodyParsin;
+  }
+
+  upload(options: UploadOptions) {
+    return uploadMiddleware(options);
   }
 
   get(path: string, ...middlewares: IMiddleware[]): void {

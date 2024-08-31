@@ -4,30 +4,38 @@ import { INext } from "../types/Next";
 
 const jsonBodyParsin = async (req: IRequest, res: IResponse, next: INext) => {
   if (req.method === "POST" || req.method === "PUT" || req.method === "PATCH") {
-    try {
-      req.body = await new Promise<any>((resolve, reject) => {
-        let bodyString = "";
+    // Verifique se o Content-Type é application/json
+    if (req.headers['content-type']?.startsWith('application/json')) {
+      try {
+        req.body = await new Promise<any>((resolve, reject) => {
+          let bodyString = "";
 
-        req.on("data", (chunk) => {
-          bodyString += chunk.toString();
-        });
+          req.on("data", (chunk) => {
+            bodyString += chunk.toString();
+          });
 
-        req.on("end", () => {
-          try {
-            resolve(JSON.parse(bodyString));
-          } catch (error) {
-            reject(error);
-          }
-        });
+          req.on("end", () => {
+            try {
+              resolve(JSON.parse(bodyString));
+            } catch (error) {
+              reject(error);
+            }
+          });
 
-        req.on("error", (err) => {
-          reject(err);
+          req.on("error", (err) => {
+            reject(err);
+          });
         });
-      });
-    } catch (error) {
-      res.statusCode = 400;
-      res.end("Erro no parse do JSON");
-      return;
+      } catch (error) {
+        if (error instanceof Error) {
+          res.statusCode = 400;
+          res.end(`Erro no parse do JSON: ${error.message}`);
+        } else {
+          res.statusCode = 400;
+          res.end("Erro desconhecido no parse do JSON");
+        }
+        return;
+      }
     }
   }
   next();
