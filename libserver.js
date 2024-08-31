@@ -1,3 +1,5 @@
+// libserver.js
+
 import http from "node:http";
 import RequestHandler from "./src/RequestHandler.js";
 import Router from "./src/Router.js";
@@ -19,24 +21,24 @@ class Server {
     return jsonBodyParsin;
   }
 
-  get(path, controller) {
-    this.router.get(path, controller);
+  get(path, ...middlewares) {
+    this.router.get(path, ...middlewares);
   }
 
-  post(path, controller) {
-    this.router.post(path, controller);
+  post(path, ...middlewares) {
+    this.router.post(path, ...middlewares);
   }
 
-  put(path, controller) {
-    this.router.put(path, controller);
+  put(path, ...middlewares) {
+    this.router.put(path, ...middlewares);
   }
 
-  patch(path, controller) {
-    this.router.patch(path, controller);
+  patch(path, ...middlewares) {
+    this.router.patch(path, ...middlewares);
   }
 
-  delete(path, controller) {
-    this.router.delete(path, controller);
+  delete(path, ...middlewares) {
+    this.router.delete(path, ...middlewares);
   }
 
   listen(port, cb) {

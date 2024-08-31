@@ -1,52 +1,56 @@
+// src/Router.js
+
 class Router {
-    constructor() {
-      this.routes = [];
-    }
-  
-    addRoute(method, path, controller) {
-      this.routes.push({ method, path, controller });
-    }
-  
-    get(path, controller) {
-      this.addRoute("GET", path, controller);
-    }
-  
-    post(path, controller) {
-      this.addRoute("POST", path, controller);
-    }
-  
-    put(path, controller) {
-      this.addRoute("PUT", path, controller);
-    }
-  
-    patch(path, controller) {
-      this.addRoute("PATCH", path, controller);
-    }
-  
-    delete(path, controller) {
-      this.addRoute("DELETE", path, controller);
-    }
-  
-    findRoute(req) {
-      return this.routes.find((r) => {
-        const pathRegex = new RegExp(
-          "^" + r.path.replace(/\/:([^\/]+)/g, "/([^/]+)") + "$"
-        );
-        const match = req.url.split("?")[0].match(pathRegex);
-        if (match) {
-          const paramNames = r.path.match(/\/:([^\/]+)/g);
-          if (paramNames) {
-            paramNames.forEach((param, index) => {
-              const paramName = param.replace("/:","");
-              req.params[paramName] = match[index + 1];
-            });
-          }
-          return r.method === req.method;
-        }
-        return false;
-      });
-    }
+  constructor() {
+    this.routes = [];
   }
-  
-  export default Router;
-  
+
+  addRoute(method, path, ...middlewares) {
+    const controller = middlewares.pop(); // O último argumento é sempre o controlador
+    this.routes.push({ method, path, middlewares, controller });
+  }
+
+  get(path, ...middlewares) {
+    this.addRoute('GET', path, ...middlewares);
+  }
+
+  post(path, ...middlewares) {
+    this.addRoute('POST', path, ...middlewares);
+  }
+
+  put(path, ...middlewares) {
+    this.addRoute('PUT', path, ...middlewares);
+  }
+
+  patch(path, ...middlewares) {
+    this.addRoute('PATCH', path, ...middlewares);
+  }
+
+  delete(path, ...middlewares) {
+    this.addRoute('DELETE', path, ...middlewares);
+  }
+
+  findRoute(req) {
+    const { method, url } = req;
+    const route = this.routes.find(r => {
+      const pathRegex = new RegExp(
+        "^" + r.path.replace(/\/:([^\/]+)/g, "/([^/]+)") + "$"
+      );
+      return method === r.method && pathRegex.test(url.split('?')[0]);
+    });
+
+    if (route) {
+      const pathMatch = url.split('?')[0].match(new RegExp(route.path.replace(/\/:([^\/]+)/g, "/([^/]+)")));
+      if (pathMatch) {
+        const paramNames = (route.path.match(/\/:([^\/]+)/g) || []).map(p => p.replace("/:",""));
+        paramNames.forEach((paramName, index) => {
+          req.params[paramName] = pathMatch[index + 1];
+        });
+      }
+    }
+
+    return route;
+  }
+}
+
+export default Router;
