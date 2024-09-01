@@ -1,0 +1,23 @@
+{
+  "name": "lib-server",
+  "type": "module",
+  "version": "1.0.7",
+  "description": "Uma biblioteca simples e leve para criar servidores HTTP em Node.js",
+  "main": "libserver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/libserver.ts",
+    "build": "npx tsup"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lib-server": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.1",
+    "tsup": "^8.2.4",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}
