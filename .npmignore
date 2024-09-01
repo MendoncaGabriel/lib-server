@@ -1,0 +1,6 @@
+# Ignorar node_modules, logs e arquivos de configuração que não são necessários
+node_modules
+*.log
+
+# Certifique-se de não incluir a linha abaixo, ou remova se já estiver lá:
+# build
