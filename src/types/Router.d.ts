@@ -9,6 +9,6 @@ export interface IRoute {
 }
 
 export interface IRouter {
-    addRouter(method: string, path: string, middlewares: IMiddleware[]) : void;
-    findRoute(req: IRequest): IRoute | undefined
+    add(method: string, path: string, middlewares: IMiddleware[]) : void;
+    find(req: IRequest): IRoute | undefined
 }

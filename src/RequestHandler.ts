@@ -1,8 +1,8 @@
-import { IMiddleware } from "./types/Middleware";
-import { IRequest } from "./types/Request";
-import { IResponse } from "./types/Response";
 import Router from "./Router";
 import { INext } from "./types/Next";
+import { IRequest } from "./types/Request";
+import { IResponse } from "./types/Response";
+import { IMiddleware } from "./types/Middleware";
 
 interface IRequestHandler {
   handleRequest(req: IRequest, res: IResponse): Promise<void>;
@@ -46,7 +46,7 @@ class RequestHandler implements IRequestHandler {
   }
 
   processRoute(req: IRequest, res: IResponse): void {
-    const route = this.router.findRoute(req);
+    const route = this.router.find(req);
   
     if (route) {
       let index = 0;

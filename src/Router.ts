@@ -1,23 +1,21 @@
-import { IMiddleware } from "./types/Middleware";
 import { IRequest } from "./types/Request";
-import { IRestMethods } from "./types/RestMethods";
 import { IRoute, IRouter } from "./types/Router";
-
+import { IMiddleware } from "./types/Middleware";
+import { IRestMethods } from "./types/RestMethods";
 
 class Router implements IRestMethods, IRouter {
   private routes: IRoute[];
-
   constructor() {
     this.routes = [];
   }
 
-  
-  addRouter(method: string, path: string, middlewares: IMiddleware[]): void { // Adiciona uma rota com método e middlewares
+
+  add(method: string, path: string, middlewares: IMiddleware[]): void { // Adiciona uma rota com método e middlewares
     const middleware = middlewares.pop(); // O último argumento é sempre o controlador
     this.routes.push({ method, path, middlewares, middleware });
   }
 
-  findRoute(req: IRequest): IRoute | undefined {   // Encontra uma rota correspondente com base na requisição
+  find(req: IRequest): IRoute | undefined {   // Encontra uma rota correspondente com base na requisição
     const { method, url, params } = req;
 
     if (!url) return undefined;
@@ -45,23 +43,23 @@ class Router implements IRestMethods, IRouter {
 
   // Métodos REST para adicionar rotas com diferentes métodos HTTP
   get(path: string, ...middlewares: IMiddleware[]): void {
-    this.addRouter('GET', path, middlewares);
+    this.add('GET', path, middlewares);
   }
 
   post(path: string, ...middlewares: IMiddleware[]): void {
-    this.addRouter('POST', path, middlewares);
+    this.add('POST', path, middlewares);
   }
 
   put(path: string, ...middlewares: IMiddleware[]): void {
-    this.addRouter('PUT', path, middlewares);
+    this.add('PUT', path, middlewares);
   }
 
   patch(path: string, ...middlewares: IMiddleware[]): void {
-    this.addRouter('PATCH', path, middlewares);
+    this.add('PATCH', path, middlewares);
   }
 
   delete(path: string, ...middlewares: IMiddleware[]): void {
-    this.addRouter('DELETE', path, middlewares);
+    this.add('DELETE', path, middlewares);
   }
 }
 
