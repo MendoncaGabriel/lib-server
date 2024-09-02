@@ -1,6 +1,6 @@
 import {
   Router_default
-} from "./chunk-RXJQXUKT.js";
+} from "./chunk-6JXX667Y.js";
 export {
   Router_default as default
 };

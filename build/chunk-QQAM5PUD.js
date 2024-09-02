@@ -1,19 +1,13 @@
-import { INext } from "../types/Next";
-import { IRequest } from "../types/Request";
-import { IResponse } from "../types/Response";
-
-const jsonBodyParsin = async (req: IRequest, res: IResponse, next: INext) => {
+// src/middlewares/json.ts
+var jsonBodyParsin = async (req, res, next) => {
   if (req.method === "POST" || req.method === "PUT" || req.method === "PATCH") {
-
-    if (req.headers['content-type']?.startsWith('application/json')) { // Verifique se o Content-Type é application/json
+    if (req.headers["content-type"]?.startsWith("application/json")) {
       try {
-        req.body = await new Promise<any>((resolve, reject) => {
+        req.body = await new Promise((resolve, reject) => {
           let bodyString = "";
-
           req.on("data", (chunk) => {
             bodyString += chunk.toString();
           });
-
           req.on("end", () => {
             try {
               resolve(JSON.parse(bodyString));
@@ -21,7 +15,6 @@ const jsonBodyParsin = async (req: IRequest, res: IResponse, next: INext) => {
               reject(error);
             }
           });
-
           req.on("error", (err) => {
             reject(err);
           });
@@ -40,5 +33,9 @@ const jsonBodyParsin = async (req: IRequest, res: IResponse, next: INext) => {
   }
   next();
 };
+var json_default = jsonBodyParsin;
 
-export default jsonBodyParsin;
+export {
+  json_default
+};
+//# sourceMappingURL=chunk-QQAM5PUD.js.map
