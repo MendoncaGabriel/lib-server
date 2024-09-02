@@ -1,13 +1,15 @@
-import Server from "../build//libserver.js"
+import Server from "../build/libserver.js"
 
 const app = new Server()
 
+app.use(app.json())
+
 app.get("/", (req, res) => {
-    console.log(res)
-    app.send("oh")
+    res.send({
+        teste: "Gabriel"
+    })
 })
 
 app.listen(3000, () => {
     console.log("Servidor esta rodando")
-
 })
