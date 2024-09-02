@@ -1,17 +1,17 @@
-# Teste de Desempenho: lib-server vs Express
+# Performance Test: lib-server vs Express
 
-Este documento descreve os testes de desempenho realizados para comparar o `lib-server` com o `Express`. O objetivo foi medir a capacidade de cada servidor de lidar com um alto volume de requisições por segundo (RPS) em um ambiente limitado de recursos.
+This document describes the performance tests conducted to compare `lib-server` with `Express`. The goal was to measure each server's ability to handle a high volume of requests per second (RPS) in a resource-constrained environment.
 
-## Ambiente de Teste
+## Test Environment
 
-Os testes foram realizados em um ambiente Docker com as seguintes especificações:
+The tests were conducted in a Docker environment with the following specifications:
 
-- **Memória**: 1024 MB
+- **Memory**: 1024 MB
 - **CPU**: 1 CPU
-- **Processador**: Intel Core i3-10100T
-- **Sistema de Contêineres**: Docker
+- **Processor**: Intel Core i3-10100T
+- **Container System**: Docker
 
-### Arquivos de Configuração
+### Configuration Files
 
 #### `docker-compose.yml`
 
@@ -43,7 +43,7 @@ EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
-## Implementação dos Servidores
+## Server Implementations
 
 ### Express
 
@@ -55,7 +55,7 @@ app.get("/", (req, res) => {
   res.send("ok");
 });
 
-app.listen(3000, () => console.log("Express rodando"));
+app.listen(3000, () => console.log("Express running"));
 ```
 
 ### lib-server
@@ -68,22 +68,22 @@ app.get("/", (req, res) => {
   res.end("ok");
 });
 
-app.listen(3000, () => console.log("lib-server rodando"));
+app.listen(3000, () => console.log("lib-server running"));
 ```
 
-## Teste de Carga com k6
+## Load Testing with k6
 
-Os testes de carga foram realizados utilizando a ferramenta [k6](https://k6.io/). O objetivo foi medir o número de requisições por segundo (RPS) que cada servidor consegue processar.
+The load tests were conducted using the [k6](https://k6.io/) tool. The goal was to measure the number of requests per second (RPS) each server could process.
 
-### Script de Teste com k6
+### k6 Test Script
 
 ```javascript
 import http from 'k6/http';
 import { check } from 'k6';
 
 export let options = {
-  vus: 300, // Número de usuários virtuais simultâneos
-  duration: '1m', // Duração do teste
+  vus: 300,
+  duration: '1m',
 };
 
 export default function () {
@@ -98,40 +98,41 @@ export default function () {
   let res = http.get(url, params);
 
   check(res, {
-    'status é 200': (r) => r.status === 200,
-    'tempo de resposta é menor que 200ms': (r) => r.timings.duration < 200,
+    'status is 200': (r) => r.status === 200,
+    'response time is less than 200ms': (r) => r.timings.duration < 200,
   });
 }
 ```
 
-## Resultados dos Testes
+## Test Results
 
 ### lib-server
 
-- **Teste 1**: Tempo: 60s | Requisições: 333,264 | RPS: 5,554.4
-- **Teste 2**: Tempo: 60s | Requisições: 303,245 | RPS: 5,049.9
-- **Teste 3**: Tempo: 60s | Requisições: 317,220 | RPS: 5,284.5
+- **Test 1**: Time: 60s | Requests: 333264 | RPS: 5554
+- **Test 2**: Time: 60s | Requests: 303245 | RPS: 5049
+- **Test 3**: Time: 60s | Requests: 317220 | RPS: 5284
 
 ### Express
 
-- **Teste 1**: Tempo: 60s | Requisições: 152,639 | RPS: 2,541.8
-- **Teste 2**: Tempo: 60s | Requisições: 152,639 | RPS: 2,541.8
-- **Teste 3**: Tempo: 60s | Requisições: 155,277 | RPS: 2,585.1
+- **Test 1**: Time: 60s | Requests: 152639 | RPS: 2541
+- **Test 2**: Time: 60s | Requests: 152639 | RPS: 2541
+- **Test 3**: Time: 60s | Requests: 155277 | RPS: 2585
 
-## Análise de Desempenho
+## Performance Analysis
 
-Com base nos resultados dos testes, o `lib-server` apresentou uma performance significativamente superior ao `Express`:
+Based on the test results, `lib-server` demonstrated significantly better performance compared to `Express`:
 
-- **lib-server** processou, em média, 5,296.27 requisições por segundo (RPS).
-- **Express** processou, em média, 2,556.23 requisições por segundo (RPS).
+- **lib-server** processed an average of 5,296.27 requests per second (RPS).
+- **Express** processed an average of 2,556.23 requests per second (RPS).
 
-### Diferença de Desempenho
+### Performance Difference
 
-O `lib-server` é aproximadamente **107,2%** mais rápido que o `Express` em termos de RPS. Isso significa que o `lib-server` praticamente dobra o desempenho em comparação ao `Express` em um ambiente de teste controlado.
+`lib-server` is approximately **107.2%** faster than `Express` in terms of RPS. This means that `lib-server` nearly doubles the performance compared to `Express` in a controlled test environment.
 
-## Conclusão
+## Conclusion
 
-Os testes mostram que o `lib-server` é uma alternativa altamente eficiente ao `Express`, especialmente em cenários onde a performance é crítica. Se o objetivo é maximizar o número de requisições por segundo em ambientes com recursos limitados, o `lib-server` se apresenta como uma opção sólida.
+The tests show that `lib-server` is a highly efficient alternative to `Express`, especially in scenarios where performance is critical. If the goal is to maximize requests per second in resource-limited environments, `lib-server` stands out as a solid option.
 
+---
 
 [README](./README.md)

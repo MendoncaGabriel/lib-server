@@ -1,53 +1,48 @@
 # LibServer
 
-**LibServer** é uma biblioteca minimalista para criação de servidores HTTP em Node.js, oferecendo uma alternativa simplificada ao Express.js, sem dependências externas. É projetada para ser leve e eficiente, facilitando a criação de servidores, o gerenciamento de rotas e middlewares, e o processamento de uploads de arquivos.
+**LibServer** is a minimalist library for creating HTTP servers in Node.js, offering a simplified alternative to Express.js, with no external dependencies. It is designed to be lightweight and efficient, making it easy to create servers, manage routes and middleware, and handle file uploads.
 
-## Recursos
+## Features
 
-- **Servidor HTTP**: Fácil criação de servidores utilizando a biblioteca nativa `http` do Node.js.
-- **Middlewares**: Suporte a middlewares globais e específicos para rotas.
-- **Rotas Dinâmicas**: Definição de rotas para os principais métodos HTTP (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`).
-- **Query Params**: Parse automático de parâmetros de consulta (query strings).
-- **Uploads de Arquivos**: Middleware nativo para gerenciamento de uploads.
-- **Suporte JSON**: Processamento de requisições e respostas no formato JSON.
+- **HTTP Server**: Easily create servers using Node.js's native `http` module.
+- **Middleware**: Support for both global and route-specific middleware.
+- **Dynamic Routing**: Define routes for the main HTTP methods (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`).
+- **Query Params**: Automatic parsing of query string parameters.
+- **File Uploads**: Native middleware for handling file uploads.
+- **JSON Support**: Process requests and responses in JSON format.
 
-## Instalação
+## Installation
 
-Instale a biblioteca através do npm:
+Install the library via npm:
 
 ```bash
 npm install lib-server
 ```
 
-## Exemplo de Uso
+## Usage Example
 
-Abaixo, um exemplo básico de como utilizar o `LibServer`:
+Here is a basic example of how to use `LibServer`:
 
 ```javascript
 import Server from 'lib-server';
 
-// Cria uma nova instância do servidor
 const app = new Server();
 
-// Middleware global para log de requisições
 app.use((req, res, next) => {
-  console.log(`Método: ${req.method}, Rota: ${req.url}`);
+  console.log(`Method: ${req.method}, Route: ${req.url}`);
   next();
 });
 
-// Rota GET para '/hello'
 app.get('/hello', (req, res) => {
-  res.end('Olá, Mundo!');
+  res.end('Hello, World!');
 });
 
-// Rota POST com middleware para upload de arquivos
-app.post('/upload', app.upload({ /* configurações de upload */ }), (req, res) => {
-  res.end('Upload realizado com sucesso!');
+app.post('/upload', app.upload({ /* upload settings */ }), (req, res) => {
+  res.end('Upload successful!');
 });
 
-// Inicia o servidor na porta 3000
 app.listen(3000, () => {
-  console.log('Servidor em execução na porta 3000');
+  console.log('Server running on port 3000');
 });
 ```
 
@@ -55,57 +50,57 @@ app.listen(3000, () => {
 
 ### `use(middleware)`
 
-Adiciona um middleware global que será executado em todas as requisições.
+Adds a global middleware that will be executed for all requests.
 
 ### `json()`
 
-Middleware para processar requisições e respostas no formato JSON.
+Middleware for processing JSON requests and responses.
 
 ### `upload(options)`
 
-Middleware para gerenciamento de uploads de arquivos. As opções podem ser configuradas conforme necessário.
+Middleware for handling file uploads. Options can be configured as needed.
 
 ### `get(path, ...middlewares)`
 
-Define uma rota para o método HTTP `GET`.
+Defines a route for the `GET` HTTP method.
 
 ### `post(path, ...middlewares)`
 
-Define uma rota para o método HTTP `POST`.
+Defines a route for the `POST` HTTP method.
 
 ### `put(path, ...middlewares)`
 
-Define uma rota para o método HTTP `PUT`.
+Defines a route for the `PUT` HTTP method.
 
 ### `patch(path, ...middlewares)`
 
-Define uma rota para o método HTTP `PATCH`.
+Defines a route for the `PATCH` HTTP method.
 
 ### `delete(path, ...middlewares)`
 
-Define uma rota para o método HTTP `DELETE`.
+Defines a route for the `DELETE` HTTP method.
 
 ### `listen(port, callback)`
 
-Inicia o servidor na porta especificada e executa o callback quando o servidor estiver pronto.
+Starts the server on the specified port and runs the callback once the server is ready.
 
-## Contribuição
+## Contributing
 
-Contribuições são sempre bem-vindas! Para contribuir, siga os passos abaixo:
+Contributions are always welcome! To contribute, please follow these steps:
 
-1. Faça um fork deste repositório.
-2. Crie uma branch para sua nova funcionalidade ou correção.
-3. Implemente suas mudanças e, se possível, adicione testes.
-4. Envie um pull request descrevendo detalhadamente suas alterações.
+1. Fork this repository.
+2. Create a branch for your feature or bug fix.
+3. Implement your changes and, if possible, add tests.
+4. Submit a pull request describing your changes in detail.
 
-Repositório oficial: [GitHub - MendoncaGabriel/lib-server](https://github.com/MendoncaGabriel/lib-server)
+Official repository: [GitHub - MendoncaGabriel/lib-server](https://github.com/MendoncaGabriel/lib-server)
 
-## Licença
+## License
 
-Este projeto está licenciado sob a [Licença MIT](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-Se você encontrar algum problema ou tiver dúvidas, sinta-se à vontade para abrir uma issue no repositório.
+If you encounter any issues or have questions, feel free to open an issue on the repository.
 
-Para detalhes sobre os [Testes de Desempenho](./Test.md), clique aqui.
+For details about [Performance Tests](./Test.md), click here.
