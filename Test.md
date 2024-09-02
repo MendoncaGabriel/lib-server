@@ -106,7 +106,7 @@ export default function () {
 
 ## Test Results
 
-### lib-server
+### Lib-Server
 
 - **Test 1**: Time: 60s | Requests: 333264 | RPS: 5554
 - **Test 2**: Time: 60s | Requests: 303245 | RPS: 5049
