@@ -1,9 +1,10 @@
-import http from "node:http";
+import http, { IncomingMessage, ServerResponse } from "node:http";
 import Router from "./Router";
 import RequestHandler from "./RequestHandler";
+import { IResponse } from "./types/Response";
 
 // middlewares
-import jsonBodyParsin from "./middlewares/json";
+import jsonBodyParsing from "./middlewares/json";
 import uploadMiddleware from "./middlewares/upload";
 
 // interfaces
@@ -11,6 +12,10 @@ import { IServer } from "./types/Server";
 import { IMiddleware } from "./types/Middleware";
 import { IRestMethods } from "./types/RestMethods";
 import { UploadOptions } from "./types/UploadOptions";
+
+// utils
+import { extendResponse } from "./utils/extendResponse";
+
 
 class Server implements IServer, IRestMethods {
   private middlewares: IMiddleware[];
@@ -23,9 +28,10 @@ class Server implements IServer, IRestMethods {
     this.router = new Router();
     this.requestHandler = new RequestHandler(this.middlewares, this.router);
 
-    this.server = http.createServer((req, res) => {
+    this.server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
       const adaptedReq = req as any;
-      const adaptedRes = res as any;
+      const adaptedRes = extendResponse(res); // Adapta res para incluir send
+
       this.requestHandler.handleRequest(adaptedReq, adaptedRes);
     });
   }
@@ -35,7 +41,7 @@ class Server implements IServer, IRestMethods {
   }
 
   json() {
-    return jsonBodyParsin;
+    return jsonBodyParsing;
   }
 
   upload(options: UploadOptions) {

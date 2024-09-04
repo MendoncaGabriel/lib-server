@@ -12,9 +12,7 @@ const md = (req, res, next) => {
 app.use(md)
 
 app.get("/", md, md, (req, res) => {
-    res.end(JSON.stringify({
-        teste: "Gabriel"
-    }))
+    res.send(`<p style="color:red;">teste</p>`)
 })
 
 app.listen(3000, () => {

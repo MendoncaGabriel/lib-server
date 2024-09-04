@@ -9,6 +9,8 @@ interface IRequestHandler {
   handleRequest(req: IRequest, res: IResponse): Promise<void>;
 }
 
+
+
 class RequestHandler implements IRequestHandler {
   constructor(
     private middlewares: IMiddleware[],
@@ -30,6 +32,7 @@ class RequestHandler implements IRequestHandler {
       });
     }
   
+    // middleware de callback controller
     await this.processRouter.process(req, res, this.router);
   }
 
