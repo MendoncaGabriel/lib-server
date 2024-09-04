@@ -1,68 +1,79 @@
 import { IResponse } from "../types/Response";
 
+const mimeTypes: Record<string, string> = {
+    json: "application/json",
+    html: "text/html",
+    text: "text/plain",
+    binary: "application/octet-stream",
+    css: "text/css",
+    js: "application/javascript",
+    xml: "application/xml",
+    svg: "image/svg+xml",
+    pdf: "application/pdf",
+    ico: "image/x-icon",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    webp: "image/webp",
+    mp3: "audio/mpeg",
+    wav: "audio/wav",
+    mp4: "video/mp4",
+    webm: "video/webm",
+    zip: "application/zip",
+    "7z": "application/x-7z-compressed",
+    // Adicione mais tipos conforme necessário
+    ttf: "font/ttf",
+    otf: "font/otf",
+    woff: "font/woff",
+    woff2: "font/woff2",
+    csv: "text/csv",
+    rtf: "application/rtf",
+    tar: "application/x-tar",
+    rar: "application/vnd.rar",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls: "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    epub: "application/epub+zip",
+    jsonld: "application/ld+json",
+    md: "text/markdown",
+    xhtml: "application/xhtml+xml",
+    bz: "application/x-bzip",
+    bz2: "application/x-bzip2",
+    sh: "application/x-sh",
+    csh: "application/x-csh",
+    jar: "application/java-archive",
+    xul: "application/vnd.mozilla.xul+xml",
+    azw: "application/vnd.amazon.ebook",
+    webma: "audio/webm",
+    ogg: "audio/ogg",
+    videoOgg: "video/ogg",
+    odt: "application/vnd.oasis.opendocument.text",
+    ods: "application/vnd.oasis.opendocument.spreadsheet",
+    odp: "application/vnd.oasis.opendocument.presentation",
+    tiff: "image/tiff",
+    bmp: "image/bmp",
+    atom: "application/atom+xml",
+    avi: "video/x-msvideo",
+    ics: "text/calendar",
+    midi: "audio/midi",
+    mpeg: "video/mpeg",
+    swf: "application/x-shockwave-flash",
+    torrent: "application/x-bittorrent",
+    yaml: "text/yaml",
+    heic: "image/heic",
+    heif: "image/heif",
+    apk: "application/vnd.android.package-archive",
+    avif: "image/avif",
+    psd: "image/vnd.adobe.photoshop",
+    mpkg: "application/vnd.apple.installer+xml",
+    webmanifest: "application/manifest+json"
+};
+
 export function setHeaderResponse(res: IResponse, type: string) {
-    switch (type) {
-        case "json":
-            res.setHeader("Content-Type", "application/json");
-            break;
-        case "html":
-            res.setHeader("Content-Type", "text/html");
-            break;
-        case "text":
-            res.setHeader("Content-Type", "text/plain");
-            break;
-        case "binary":
-            res.setHeader("Content-Type", "application/octet-stream");
-            break;
-        case "css":
-            res.setHeader("Content-Type", "text/css");
-            break;
-        case "js":
-            res.setHeader("Content-Type", "application/javascript");
-            break;
-        case "xml":
-            res.setHeader("Content-Type", "application/xml");
-            break;
-        case "svg":
-            res.setHeader("Content-Type", "image/svg+xml");
-            break;
-        case "pdf":
-            res.setHeader("Content-Type", "application/pdf");
-            break;
-        case "ico":
-            res.setHeader("Content-Type", "image/x-icon");
-            break;
-        case "jpg":
-        case "jpeg":
-            res.setHeader("Content-Type", "image/jpeg");
-            break;
-        case "png":
-            res.setHeader("Content-Type", "image/png");
-            break;
-        case "gif":
-            res.setHeader("Content-Type", "image/gif");
-            break;
-        case "webp":
-            res.setHeader("Content-Type", "image/webp");
-            break;
-        case "mp3":
-            res.setHeader("Content-Type", "audio/mpeg");
-            break;
-        case "wav":
-            res.setHeader("Content-Type", "audio/wav");
-            break;
-        case "mp4":
-            res.setHeader("Content-Type", "video/mp4");
-            break;
-        case "webm":
-            res.setHeader("Content-Type", "video/webm");
-        case "zip":
-            res.setHeader("Content-Type", "application/zip");
-            break;
-        case "7z":
-            res.setHeader("Content-Type", "application/x-7z-compressed");
-            break;
-        default:
-            res.setHeader("Content-Type", "text/plain");
-    }
+    const contentType = mimeTypes[type] || "text/plain";
+    res.setHeader("Content-Type", contentType);
 }

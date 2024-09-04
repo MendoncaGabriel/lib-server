@@ -8,8 +8,8 @@ app.get("/", (req, res) => {
     // res.send("Gabriel")
     // res.send({nome: "Gabriel"})
     // res.send(path.resolve("public", "img.webp"))
-    // res.send(path.resolve("public", "video.mp4"))
-    res.send(`<p style="color:red;">teste</p>`)
+    res.send(path.resolve("public", "video.mp4"))
+    // res.send(`<p style="color:red;">teste</p>`)
 })
 
 app.listen(3000, () => {
