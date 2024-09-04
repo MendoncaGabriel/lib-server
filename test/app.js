@@ -5,6 +5,7 @@ const app = new Server()
 app.use(app.json())
 
 app.get("/", (req, res) => {
+    res
     // res.send("Gabriel")
     // res.send({nome: "Gabriel"})
     // res.send(path.resolve("public", "img.webp"))

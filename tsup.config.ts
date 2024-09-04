@@ -1,11 +1,12 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/libserver.ts'], // ou qualquer arquivo de entrada principal
+  entry: ['src/libserver.ts'], 
   format: ['esm'],
   outDir: 'build',
-  splitting: false, // Desativa o splitting para gerar um único arquivo
-  sourcemap: false, // Desativa a geração de mapas de origem
-  minify: true, // Habilita a minificação
-  // clean: true // Limpa a pasta de saída antes de gerar os arquivos
+  splitting: false, 
+  sourcemap: false, 
+  minify: true, 
+  dts: true
+  // clean: true 
 });
