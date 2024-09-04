@@ -42,6 +42,9 @@ export function setHeaderResponse(res: IResponse, type: string) {
         case "gif":
             res.setHeader("Content-Type", "image/gif");
             break;
+        case "webp":
+            res.setHeader("Content-Type", "image/webp");
+            break;
         case "mp3":
             res.setHeader("Content-Type", "audio/mpeg");
             break;
@@ -53,7 +56,6 @@ export function setHeaderResponse(res: IResponse, type: string) {
             break;
         case "webm":
             res.setHeader("Content-Type", "video/webm");
-            break;
         case "zip":
             res.setHeader("Content-Type", "application/zip");
             break;

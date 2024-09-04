@@ -1,17 +1,14 @@
 import Server from "../build/libserver.js"
+import path from "path"
 
 const app = new Server()
-
 app.use(app.json())
 
-
-const md = (req, res, next) => {
-    console.log("ok")
-    next()
-}
-app.use(md)
-
-app.get("/", md, md, (req, res) => {
+app.get("/", (req, res) => {
+    // res.send("Gabriel")
+    // res.send({nome: "Gabriel"})
+    // res.send(path.resolve("public", "img.webp"))
+    // res.send(path.resolve("public", "video.mp4"))
     res.send(`<p style="color:red;">teste</p>`)
 })
 
