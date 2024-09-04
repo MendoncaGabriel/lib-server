@@ -5,17 +5,17 @@ import { IRestMethods } from "./types/RestMethods";
 
 class Router implements IRestMethods, IRouter {
   private routes: IRoute[];
+  
   constructor() {
     this.routes = [];
   }
 
-
-  add(method: string, path: string, middlewares: IMiddleware[]): void { // Adiciona uma rota com método e middlewares
-    const middleware = middlewares.pop(); // O último argumento é sempre o controlador
+  add(method: string, path: string, middlewares: IMiddleware[]): void { 
+    const middleware = middlewares.pop(); 
     this.routes.push({ method, path, middlewares, middleware });
   }
 
-  find(req: IRequest): IRoute | undefined {   // Encontra uma rota correspondente com base na requisição
+  find(req: IRequest): IRoute | undefined {
     const { method, url, params } = req;
 
     if (!url) return undefined;
@@ -30,7 +30,7 @@ class Router implements IRestMethods, IRouter {
 
       if (pathMatch) {
         const paramNames = (route.path.match(/\/:([^\/]+)/g) || []).map(p => p.replace("/:", ""));
-        req.params = req.params || {}; // Inicializa params se não estiver definido
+        req.params = req.params || {}; 
         
         paramNames.forEach((paramName, index) => {
           req.params![paramName] = pathMatch[index + 1];
@@ -41,7 +41,6 @@ class Router implements IRestMethods, IRouter {
     return route;
   }
 
-  // Métodos REST para adicionar rotas com diferentes métodos HTTP
   get(path: string, ...middlewares: IMiddleware[]): void {
     this.add('GET', path, middlewares);
   }

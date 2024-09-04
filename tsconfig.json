@@ -7,7 +7,10 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "declaration": true,             // Gera os arquivos .d.ts
+    "declarationMap": true,          // Gera source maps para os arquivos .d.ts
+    "emitDeclarationOnly": false     // Gera os arquivos .js e .d.ts ao mesmo tempo
   },
   "include": ["src/**/*", "tsup.config.ts"],
   "exclude": ["node_modules"]

@@ -30,10 +30,6 @@ class Server implements IServer, IRestMethods {
     });
   }
 
-  send(response: any){
-    res.end(response)
-  }
-
   use(middleware: IMiddleware) {
     this.middlewares.push(middleware);
   }

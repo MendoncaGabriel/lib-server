@@ -7,4 +7,5 @@ export interface IRequest extends IncomingMessage {
     query: { [key: string]: string };
     body?: any;
     files?: string[]
+    secure?: any
 }
