@@ -1,20 +1,22 @@
-import Server from "../build/libserver.js"
-import path from "path"
+import { Server } from "../build/libserver.js";
+import router from "./routers.js";
 
-const app = new Server()
-app.use(app.json())
+const app = new Server();
 
-app.get("/", (req, res) => {
-    
-    // res.send("Gabriel")
-    // res.send({nome: "Gabriel"})
-    // res.send(path.resolve("public", "img.webp"))
-    res.send(path.resolve("public", "video.mp4"))
-    // res.send(`<p style="color:red;">teste</p>`)
-})
+app.use(app.json());
 
-app.use("/teste", (req, res) => res.send("teste"))
+app.use((req, res, next) => {
+  console.log(`Recebendo requisição: ${req.method} ${req.url}`);
+  next();
+});
 
+
+
+app.root("/run", router); // Adiciona o router com prefixo
+app.get("/main", (req, res) => {
+  res.send("main");
+});
 app.listen(3000, () => {
-    console.log("Servidor esta rodando")
-})
+  console.log("Servidor está rodando");
+});
+export { app };

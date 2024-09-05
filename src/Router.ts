@@ -1,3 +1,4 @@
+// Router.ts
 import { IRequest } from "./types/Request";
 import { IRoute, IRouter } from "./types/Router";
 import { IMiddleware } from "./types/Middleware";
@@ -5,18 +6,39 @@ import { IRestMethods } from "./types/RestMethods";
 
 class Router implements IRestMethods, IRouter {
   private routes: IRoute[];
-  
+
   constructor() {
     this.routes = [];
   }
 
-  add(method: string, path: string, middlewares: IMiddleware[]): void { 
-    const middleware = middlewares.pop(); 
-    this.routes.push({ method, path, middlewares, middleware });
+  addMiddleware(method: string, path: string, middlewares: IMiddleware[]): void { 
+    this.routes.push({ 
+      method, 
+      path, 
+      middlewares, 
+      middleware: middlewares[middlewares.length - 1] // Último middleware é o principal
+    });
   }
 
+  addRouterWithPrefix(prefix: string, router: Router): void {
+    if (router.routes && Array.isArray(router.routes)) {
+        router.routes.forEach(route => {
+            this.routes.push({
+                method: route.method,
+                path: prefix + route.path,
+                middlewares: route.middlewares,
+                middleware: route.middleware,
+            });
+        });
+    } else {
+        // Lidar com o caso em que router.routes está indefinido ou não é um array
+        console.error("Router passado não possui rotas definidas.");
+    }
+}
+
+
   find(req: IRequest): IRoute | undefined {
-    const { method, url, params } = req;
+    const { method, url } = req;
 
     if (!url) return undefined;
 
@@ -41,24 +63,25 @@ class Router implements IRestMethods, IRouter {
     return route;
   }
 
+  // Métodos HTTP padrão (get, post, etc.)
   get(path: string, ...middlewares: IMiddleware[]): void {
-    this.add('GET', path, middlewares);
+    this.addMiddleware("GET", path, middlewares);
   }
 
   post(path: string, ...middlewares: IMiddleware[]): void {
-    this.add('POST', path, middlewares);
+    this.addMiddleware("POST", path, middlewares);
   }
 
   put(path: string, ...middlewares: IMiddleware[]): void {
-    this.add('PUT', path, middlewares);
+    this.addMiddleware("PUT", path, middlewares);
   }
 
   patch(path: string, ...middlewares: IMiddleware[]): void {
-    this.add('PATCH', path, middlewares);
+    this.addMiddleware("PATCH", path, middlewares);
   }
 
   delete(path: string, ...middlewares: IMiddleware[]): void {
-    this.add('DELETE', path, middlewares);
+    this.addMiddleware("DELETE", path, middlewares);
   }
 }
 

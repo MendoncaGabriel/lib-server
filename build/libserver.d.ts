@@ -24,17 +24,39 @@ interface IMiddleware {
     (req: IRequest, res: IResponse, next: INext): void;
 }
 
-interface IServer {
-  listen(port: number, cb: () => void): void;
-  use(middleware: IMiddleware): void;
+interface IRoute {
+    method: string;
+    path: string;
+    middlewares: IMiddleware[];
+    middleware?: IMiddleware;
+}
+
+interface IRouter {
+    addMiddleware(method: string, path: string, middlewares: IMiddleware[]) : void;
+    addRouterWithPrefix(prefix: string, router: Router) : void;
+    find(req: IRequest): IRoute | undefined
 }
 
 interface IRestMethods {
+
+}
+
+declare class Router$1 implements IRestMethods, IRouter {
+    private routes;
+    constructor();
+    addMiddleware(method: string, path: string, middlewares: IMiddleware[]): void;
+    addRouterWithPrefix(prefix: string, router: Router$1): void;
+    find(req: IRequest): IRoute | undefined;
     get(path: string, ...middlewares: IMiddleware[]): void;
     post(path: string, ...middlewares: IMiddleware[]): void;
     put(path: string, ...middlewares: IMiddleware[]): void;
     patch(path: string, ...middlewares: IMiddleware[]): void;
     delete(path: string, ...middlewares: IMiddleware[]): void;
+}
+
+interface IServer {
+  listen(port: number, cb: () => void): void;
+  use(middleware: IMiddleware): void;
 }
 
 interface UploadOptions {
@@ -43,6 +65,14 @@ interface UploadOptions {
     format: string
 }
 
+declare class RootRouter {
+    private router;
+    private prefix;
+    constructor(prefix?: string);
+    get(path: string, ...middlewares: IMiddleware[]): void;
+    post(path: string, ...middlewares: IMiddleware[]): void;
+    getRouter(): Router$1;
+}
 declare class Server implements IServer, IRestMethods {
     private middlewares;
     private router;
@@ -52,6 +82,7 @@ declare class Server implements IServer, IRestMethods {
     use(middleware: IMiddleware): void;
     json(): (req: IRequest, res: IResponse, next: INext) => Promise<void>;
     upload(options: UploadOptions): (req: IRequest, res: any, next: any) => any;
+    root(prefix: string, rootRouter: RootRouter): void;
     get(path: string, ...middlewares: IMiddleware[]): void;
     post(path: string, ...middlewares: IMiddleware[]): void;
     put(path: string, ...middlewares: IMiddleware[]): void;
@@ -60,4 +91,4 @@ declare class Server implements IServer, IRestMethods {
     listen(port: number, cb: () => void): void;
 }
 
-export { Server as default };
+export { RootRouter, Server };

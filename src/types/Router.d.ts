@@ -9,6 +9,7 @@ export interface IRoute {
 }
 
 export interface IRouter {
-    add(method: string, path: string, middlewares: IMiddleware[]) : void;
+    addMiddleware(method: string, path: string, middlewares: IMiddleware[]) : void;
+    addRouterWithPrefix(prefix: string, router: Router) : void;
     find(req: IRequest): IRoute | undefined
 }

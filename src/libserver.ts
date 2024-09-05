@@ -1,3 +1,4 @@
+// libserver.ts
 import http, { IncomingMessage, ServerResponse } from "node:http";
 import Router from "./Router";
 import RequestHandler from "./RequestHandler";
@@ -16,6 +17,46 @@ import { UploadOptions } from "./types/UploadOptions";
 // utils
 import { extendResponse } from "./utils/extendResponse";
 
+class RootRouter {
+  private router: Router;
+  private prefix: string;
+
+  constructor(prefix: string = "") {
+    this.router = new Router();
+    this.prefix = prefix;  // Define o prefixo
+  }
+
+  get(path: string, ...middlewares: IMiddleware[]): void {
+    const fullPath = this.prefix + path;
+    this.router.addMiddleware("GET", fullPath, middlewares);
+  }
+
+  post(path: string, ...middlewares: IMiddleware[]): void {
+    const fullPath = this.prefix + path;
+    this.router.addMiddleware("POST", fullPath, middlewares);
+  }
+
+  put(path: string, ...middlewares: IMiddleware[]): void {
+    const fullPath = this.prefix + path;
+    this.router.addMiddleware("PUT", fullPath, middlewares);
+  }
+
+  patch(path: string, ...middlewares: IMiddleware[]): void {
+    const fullPath = this.prefix + path;
+    this.router.addMiddleware("PATCH", fullPath, middlewares);
+  }
+
+  delete(path: string, ...middlewares: IMiddleware[]): void {
+    const fullPath = this.prefix + path;
+    this.router.addMiddleware("DELETE", fullPath, middlewares);
+  }
+
+  // Retorna o router para ser usado no servidor principal
+  getRouter(): Router {
+    return this.router;
+  }
+}
+
 
 class Server implements IServer, IRestMethods {
   private middlewares: IMiddleware[];
@@ -30,8 +71,7 @@ class Server implements IServer, IRestMethods {
 
     this.server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
       const adaptedReq = req as any;
-      const adaptedRes = extendResponse(res); // Adapta res para incluir send
-
+      const adaptedRes = extendResponse(res); 
       this.requestHandler.handleRequest(adaptedReq, adaptedRes);
     });
   }
@@ -46,6 +86,10 @@ class Server implements IServer, IRestMethods {
 
   upload(options: UploadOptions) {
     return uploadMiddleware(options);
+  }
+
+  root(prefix: string, rootRouter: RootRouter): void {
+    this.router.addRouterWithPrefix(prefix, rootRouter.getRouter());
   }
 
   get(path: string, ...middlewares: IMiddleware[]): void {
@@ -73,4 +117,4 @@ class Server implements IServer, IRestMethods {
   }
 }
 
-export default Server;
+export { Server, RootRouter };
