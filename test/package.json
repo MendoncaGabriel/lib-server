@@ -11,6 +11,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "lib-server": "^1.1.3"
+    "lib-server": "^1.2.0"
   }
 }
